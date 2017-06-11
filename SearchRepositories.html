@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html ng-app="topjs">
+
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.js"></script>
+    <script type="text/javascript" src="controllers/searchController.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+<style>
+    .blue {
+        color: blue;
+    }
+    
+    .black {
+        color: black;
+    }
+</style>
+
+<body ng-controller="searchController">
+
+    <form ng-submit="searchFun()">
+        <input ng-model="searchVal" id="search" />
+        <input type="submit" value="Search" />
+    </form>
+
+    <div>
+        <ul>
+            <li ng-repeat="doc in documents track by $index" ng-class="{blue: isDisabled(doc.id), black: !isDisabled(doc.id)}">{{ doc.full_name }}
+                <div></div>
+                <div>
+                    <div></div>
+                    <span>Forks:  {{ doc.forks}}      Stars: {{ doc.stargazers_count }}</span>
+                </div>
+                <button class="import" ng-disabled="isDisabled(doc.id)" ng-click="readPackages($index,doc,doc.owner.login, doc.name, doc.id)">Import</button>
+                <hr>
+            </li>
+        </ul>
+    </div>
+
+    <div ng-show="imported.length > 0">
+        <div>Top Packages</div>
+        <div></div>
+        <input placeholder="search" ng-model="searchKeyword" id="search" />
+        <div ng-init="listPackages()">
+            <ul>
+                <li ng-model="item" ng-repeat="item in keyDependencies | filter: searchKeyword">
+                    <div>
+                        {{item}}
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>
