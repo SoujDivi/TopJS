@@ -16,6 +16,10 @@ var app = angular.module("topjs", [])
                 });
         }
 
+        //
+        // Check if the repo is already imported
+        // return true if imported
+        //
         $scope.isDisabled = function (id) {
             if ($rootScope.imported.indexOf(id) === -1) {
                 return false;
@@ -29,43 +33,42 @@ var app = angular.module("topjs", [])
 
             $rootScope.imported.push(id);
             $scope.selectedIndex = $index;
-
             packageUrl = "https://raw.githubusercontent.com/" + owner + "/" + name + "/master/package.json"
 
             $scope.storedItems = [];
 
+            // Get package.json for each individual repo and
+            // call setPackages with dependency_name to store and
+            //increment the dependency package
             $http.get(packageUrl)
                 .then(function (response) {
                     $scope.packages = response.data.devDependencies;
-
                     for (var key in $scope.packages) {
-                        $scope.setPackages(key);
-                    }
-
+                        $scope.setPackages(key);}
                 })
                 .catch(function (data) {
-                    console.error("Error in retrieving");   //alert to notify if package.json doesn't exist or exists with no dependencies
+                    //alert to notify if package.json doesn't exist or exists with no dependencies
                     alert("This project does not contain a valid package.json file");
                 });
-
             $scope.listPackages();
-
         }
 
 
-        $scope.setPackages = function (key) {    //get data from database(local storage)
+        $scope.setPackages = function (key) {  
             var pack = {};
             var count = 1;
             var key;
             if ((key in localStorage)) {
                 var val = localStorage.getItem(key)
                 count = count + parseInt(val);
-                console.log("check this " + key + " " + count);
             }
             localStorage.setItem(key, count);
 
         }
 
+        // Get all packages from localStorage,
+        // Sort packages based on number of imports
+        // push top 10 packages to keyDependencies
         $scope.keyDependencies = [];
         $scope.listPackages = function () {
             var packages = {};
@@ -76,20 +79,17 @@ var app = angular.module("topjs", [])
             $scope.keyDependencies = sortedPackages.slice(0, 10);
         }
 
-        $scope.searchPack = function (searchValue) { //search through top packages(two-way databinding)
-
+        // 
+        //search through top packages(two-way databinding)
+        //
+        $scope.searchPack = function (searchValue) { 
             angular.forEach($scope.getPackages, function (value, key) {
                 if (key == searchValue) {
                     $scope.results.push({
                         Name: key,
                         Version: value
                     }).$filter(lowercase);
-
                 }
-
-
             });
         };
-
-
     }]);
